@@ -251,18 +251,6 @@ Shipping cost to Europe?</textarea
         </div>
       </div>
 
-      <footer>
-        View the source of this page on
-        <a
-          href="https://github.com/authava/authava-examples/blob/main/chatbot-widget/sample-integration.html"
-          target="_blank"
-          rel="noopener"
-          >GitHub</a
-        >. Full widget API reference lives in the
-        <a href="https://github.com/authava/chatbot-widget#api-reference" target="_blank" rel="noopener"
-          >widget repo</a
-        >.
-      </footer>
     </main>
 
     <script>
@@ -281,16 +269,6 @@ Shipping cost to Europe?</textarea
       // Default is whatever the widget bundle ships with.
       const apiBaseUrl = params.get('apiBaseUrl')
 
-      // Inject the widget loader. Doing it from JS (rather than a static
-      // <script> tag) lets us thread the tenant id through to the host page's
-      // query string in one place.
-      const loader = document.createElement('script')
-      loader.src = widgetUrl
-      loader.setAttribute('data-id', tenantId)
-      if (apiBaseUrl) loader.setAttribute('data-api-base-url', apiBaseUrl)
-      loader.async = true
-      document.body.appendChild(loader)
-
       // All the host-page controls are disabled until the widget dispatches
       // AuthavaChatbotReady — attempting to call the client before then would
       // silently no-op because window.AuthavaChatbot_<tenantId> doesn't exist yet.
@@ -306,6 +284,10 @@ Shipping cost to Europe?</textarea
         'hide-bot-btn',
       ]
 
+      // Attach the ready listener BEFORE injecting the loader. The widget
+      // dispatches `AuthavaChatbotReady` exactly once right after its first
+      // render, so a cached bundle finishing before the listener attaches
+      // would leave this page stuck on "Waiting for widget…" forever.
       window.addEventListener('AuthavaChatbotReady', (event) => {
         const client = event.detail.client
         document.getElementById('status').textContent = 'Widget ready — try the controls below'
@@ -347,6 +329,18 @@ Shipping cost to Europe?</textarea
         document.getElementById('show-bot-btn').addEventListener('click', () => client.open())
         document.getElementById('hide-bot-btn').addEventListener('click', () => client.close())
       })
+
+      // Inject the widget loader AFTER the ready-event listener is wired up,
+      // so a cached bundle that finishes before the next tick still fires into
+      // our listener. Threading tenant id and api-base-url via setAttribute
+      // instead of a static <script> tag lets us honour the ?tenantId and
+      // ?apiBaseUrl query params in one place.
+      const loader = document.createElement('script')
+      loader.src = widgetUrl
+      loader.setAttribute('data-id', tenantId)
+      if (apiBaseUrl) loader.setAttribute('data-api-base-url', apiBaseUrl)
+      loader.async = true
+      document.body.appendChild(loader)
     </script>
   </body>
 </html>
