@@ -74,7 +74,7 @@
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
-        align-items: stretch;
+        align-items: flex-end;
       }
       label.inline {
         display: flex;
@@ -87,20 +87,23 @@
       input[type='text'],
       textarea {
         width: 100%;
-        padding: 10px 12px;
+        padding: 6px 10px;
         border: 1px solid var(--border);
         border-radius: 6px;
         font-size: 14px;
         font-family: inherit;
         color: #111827;
         background: #fff;
+        height: 32px;
       }
       textarea {
         min-height: 72px;
+        height: auto;
         resize: vertical;
       }
       button {
-        padding: 10px 16px;
+        padding: 6px 14px;
+        height: 32px;
         border: 1px solid var(--accent);
         background: var(--accent);
         color: #fff;
@@ -170,6 +173,17 @@
 
     <main>
       <div class="section">
+        <h2>Show or hide the widget</h2>
+        <p class="help">
+          Calls <code>client.open()</code> and <code>client.close()</code>.
+        </p>
+        <div class="row">
+          <button id="show-bot-btn" disabled>Show Bot Window</button>
+          <button id="hide-bot-btn" class="secondary" disabled>Hide Bot Window</button>
+        </div>
+      </div>
+
+      <div class="section">
         <h2>Send a message as the visitor</h2>
         <p class="help">
           Calls <code>client.sendMessage(text)</code>. If the widget is closed, it opens first
@@ -237,17 +251,6 @@ Shipping cost to Europe?</textarea
         <div class="row" style="margin-top: 10px">
           <button id="set-presets-btn" disabled>Update presets</button>
           <button id="clear-presets-btn" class="secondary" disabled>Clear</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Show or hide the widget</h2>
-        <p class="help">
-          Calls <code>client.open()</code> and <code>client.close()</code>.
-        </p>
-        <div class="row">
-          <button id="show-bot-btn" disabled>Show Bot Window</button>
-          <button id="hide-bot-btn" class="secondary" disabled>Hide Bot Window</button>
         </div>
       </div>
 
