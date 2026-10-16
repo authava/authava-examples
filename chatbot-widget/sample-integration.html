@@ -6,7 +6,7 @@
     <title>Authava Chatbot Widget — Sample Integration</title>
     <meta
       name="description"
-      content="Live sample page showing how to drive the Authava chat widget from a host page: programmatic send, show/hide, tooltip, disclaimer, and preset-question overrides."
+      content="Live sample page showing how to drive the Authava chat widget from a host page: programmatic send, show/hide, and tooltip overrides."
     />
     <style>
       :root {
@@ -215,45 +215,6 @@
         </div>
       </div>
 
-      <div class="section">
-        <h2>Replace the disclaimer</h2>
-        <p class="help">
-          Calls <code>client.setDisclaimer(text)</code> and <code>client.clearDisclaimer()</code>.
-          Setting a new disclaimer clears the per-tenant "accepted" flag so the banner re-shows
-          even for a returning visitor.
-        </p>
-        <div class="row">
-          <label class="inline">
-            Disclaimer text
-            <input id="disclaimer-input" type="text" value="Beta — responses may be inaccurate" />
-          </label>
-          <button id="set-disclaimer-btn" disabled>Set disclaimer</button>
-          <button id="clear-disclaimer-btn" class="secondary" disabled>Clear</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Update the preset-question chips</h2>
-        <p class="help">
-          Calls <code>client.setPresetQuestions(lines)</code> and
-          <code>client.clearPresetQuestions()</code>. One question per line.
-        </p>
-        <div class="row">
-          <label class="inline">
-            Preset questions
-            <textarea id="presets-input">
-Where is my order?
-How do I return something?
-Shipping cost to Europe?</textarea
-            >
-          </label>
-        </div>
-        <div class="row" style="margin-top: 10px">
-          <button id="set-presets-btn" disabled>Update presets</button>
-          <button id="clear-presets-btn" class="secondary" disabled>Clear</button>
-        </div>
-      </div>
-
     </main>
 
     <script>
@@ -279,10 +240,6 @@ Shipping cost to Europe?</textarea
         'send-btn',
         'show-tooltip-btn',
         'hide-tooltip-btn',
-        'set-disclaimer-btn',
-        'clear-disclaimer-btn',
-        'set-presets-btn',
-        'clear-presets-btn',
         'show-bot-btn',
         'hide-bot-btn',
       ]
@@ -309,25 +266,6 @@ Shipping cost to Europe?</textarea
         document
           .getElementById('hide-tooltip-btn')
           .addEventListener('click', () => client.hideTooltip())
-
-        document.getElementById('set-disclaimer-btn').addEventListener('click', () => {
-          client.setDisclaimer(document.getElementById('disclaimer-input').value)
-        })
-        document
-          .getElementById('clear-disclaimer-btn')
-          .addEventListener('click', () => client.clearDisclaimer())
-
-        document.getElementById('set-presets-btn').addEventListener('click', () => {
-          const lines = document
-            .getElementById('presets-input')
-            .value.split('\n')
-            .map((l) => l.trim())
-            .filter(Boolean)
-          client.setPresetQuestions(lines)
-        })
-        document
-          .getElementById('clear-presets-btn')
-          .addEventListener('click', () => client.clearPresetQuestions())
 
         document.getElementById('show-bot-btn').addEventListener('click', () => client.open())
         document.getElementById('hide-bot-btn').addEventListener('click', () => client.close())
