@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authava Chatbot Widget — Sample Integration</title>
+    <meta
+      name="description"
+      content="Live sample page showing how to drive the Authava chat widget from a host page: programmatic send, show/hide, and tooltip overrides."
+    />
+    <style>
+      :root {
+        --accent: #6a1cff;
+        --accent-dark: #4a0fcc;
+        --border: #e5e7eb;
+        --muted: #6b7280;
+        --surface: #ffffff;
+        --bg: #faf7ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          'Helvetica Neue',
+          sans-serif;
+        color: #111827;
+        background: var(--bg);
+        line-height: 1.5;
+      }
+      header {
+        padding: 24px 32px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+      }
+      header h1 {
+        margin: 0 0 4px;
+        font-size: 20px;
+        color: var(--accent-dark);
+      }
+      header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      main {
+        max-width: 780px;
+        margin: 32px auto;
+        padding: 0 24px 160px;
+      }
+      .section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+      }
+      .section h2 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        color: #111827;
+      }
+      .section p.help {
+        margin: 0 0 14px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      label.inline {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1 1 240px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      input[type='text'],
+      textarea {
+        width: 100%;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+        color: #111827;
+        background: #fff;
+        height: 32px;
+      }
+      textarea {
+        min-height: 72px;
+        height: auto;
+        resize: vertical;
+      }
+      button {
+        padding: 6px 14px;
+        height: 32px;
+        border: 1px solid var(--accent);
+        background: var(--accent);
+        color: #fff;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background 0.1s,
+          border-color 0.1s;
+      }
+      button:hover {
+        background: var(--accent-dark);
+        border-color: var(--accent-dark);
+      }
+      button.secondary {
+        background: #fff;
+        color: var(--accent);
+      }
+      button.secondary:hover {
+        background: #f3eeff;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .status.waiting {
+        background: #fff7ed;
+        color: #9a3412;
+      }
+      .status.ready {
+        background: #ecfdf5;
+        color: #065f46;
+      }
+      footer {
+        margin-top: 48px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      footer a {
+        color: var(--accent);
+      }
+      code {
+        background: #f3eeff;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Authava Chatbot Widget — Sample Integration</h1>
+      <p>
+        Drive the embedded widget from this page's controls.
+        Status: <span id="status" class="status waiting">Waiting for widget…</span>
+      </p>
+    </header>
+
+    <main>
+      <div class="section">
+        <h2>Show or hide the widget</h2>
+        <p class="help">
+          Calls <code>client.open()</code> and <code>client.close()</code>.
+        </p>
+        <div class="row">
+          <button id="show-bot-btn" disabled>Show Bot Window</button>
+          <button id="hide-bot-btn" class="secondary" disabled>Hide Bot Window</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Send a message as the visitor</h2>
+        <p class="help">
+          Calls <code>client.sendMessage(text)</code>. If the widget is closed, it opens first
+          so the visitor actually sees the message appear and the bot's reply stream in.
+        </p>
+        <div class="row">
+          <label class="inline">
+            Message to send
+            <input id="send-input" type="text" value="Hello from the host page" />
+          </label>
+          <button id="send-btn" disabled>Send to Bot</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Show / hide the launcher tooltip</h2>
+        <p class="help">
+          Calls <code>client.showTooltip(text)</code> and <code>client.hideTooltip()</code>.
+          The tooltip only appears when the widget is closed; click <strong>Hide Bot Window</strong>
+          first to see it in action.
+        </p>
+        <div class="row">
+          <label class="inline">
+            Tooltip text
+            <input id="tooltip-input" type="text" value="Need a hand picking something?" />
+          </label>
+          <button id="show-tooltip-btn" disabled>Show tooltip</button>
+          <button id="hide-tooltip-btn" class="secondary" disabled>Hide tooltip</button>
+        </div>
+      </div>
+
+    </main>
+
+    <script>
+      // Resolve the tenant id — allow ?tenantId=<uuid> overrides so a prospect
+      // can point the demo at their own bot without editing this file.
+      const DEFAULT_TENANT_ID = '00000000-0000-4000-a000-000000000001'
+      const DEFAULT_WIDGET_URL = 'https://cdn.authava.com/chatbot.js'
+      const params = new URLSearchParams(window.location.search)
+      const tenantId = params.get('tenantId') || DEFAULT_TENANT_ID
+      // `?widget=<url>` points this page at a locally-served build of the widget
+      // (e.g. http://localhost:5174/chatbot.js) so a developer can
+      // exercise unpushed API changes end-to-end before merging.
+      const widgetUrl = params.get('widget') || DEFAULT_WIDGET_URL
+      // `?apiBaseUrl=<url>` lets a developer point the widget at a non-production
+      // services API (e.g. https://services.authava.dev/api/v1/bot for local dev).
+      // Default is whatever the widget bundle ships with.
+      const apiBaseUrl = params.get('apiBaseUrl')
+
+      // All the host-page controls are disabled until the widget dispatches
+      // AuthavaChatbotReady — attempting to call the client before then would
+      // silently no-op because window.AuthavaChatbot_<tenantId> doesn't exist yet.
+      const controlIds = [
+        'send-btn',
+        'show-tooltip-btn',
+        'hide-tooltip-btn',
+        'show-bot-btn',
+        'hide-bot-btn',
+      ]
+
+      // Attach the ready listener BEFORE injecting the loader. The widget
+      // dispatches `AuthavaChatbotReady` exactly once right after its first
+      // render, so a cached bundle finishing before the listener attaches
+      // would leave this page stuck on "Waiting for widget…" forever.
+      window.addEventListener('AuthavaChatbotReady', (event) => {
+        const client = event.detail.client
+        document.getElementById('status').textContent = 'Widget ready — try the controls below'
+        document.getElementById('status').className = 'status ready'
+        controlIds.forEach((id) => (document.getElementById(id).disabled = false))
+
+        document.getElementById('send-btn').addEventListener('click', () => {
+          const text = document.getElementById('send-input').value.trim()
+          if (text) client.sendMessage(text)
+        })
+
+        document.getElementById('show-tooltip-btn').addEventListener('click', () => {
+          const text = document.getElementById('tooltip-input').value.trim()
+          client.showTooltip(text || undefined)
+        })
+        document
+          .getElementById('hide-tooltip-btn')
+          .addEventListener('click', () => client.hideTooltip())
+
+        document.getElementById('show-bot-btn').addEventListener('click', () => client.open())
+        document.getElementById('hide-bot-btn').addEventListener('click', () => client.close())
+      })
+
+      // Inject the widget loader AFTER the ready-event listener is wired up,
+      // so a cached bundle that finishes before the next tick still fires into
+      // our listener. Threading tenant id and api-base-url via setAttribute
+      // instead of a static <script> tag lets us honour the ?tenantId and
+      // ?apiBaseUrl query params in one place.
+      const loader = document.createElement('script')
+      loader.src = widgetUrl
+      loader.setAttribute('data-id', tenantId)
+      if (apiBaseUrl) loader.setAttribute('data-api-base-url', apiBaseUrl)
+      loader.async = true
+      document.body.appendChild(loader)
+    </script>
+  </body>
+</html>
